@@ -81,11 +81,11 @@ The episode ends if the following happens:
 
 `step()` and `reset()` return a dict with the following keys:
 
-- p - transition proability for the state.
+- p - transition probability for the state.
 - action_mask - if actions will cause a transition to a new state.
 
 As taxi is not stochastic, the transition probability is always 1.0.
 
 For some cases, taking an action will have no effect on the state of the episode. In v0.25.0, `info["action_mask"]` contains a np.ndarray for each of the actions specifying if the action will change the state.
 
-To sample a modifying action, use `action = env.action_space.sample(info["action_mask"])` Or with a Q-value based algorithm `action = np.argmax(q_values[obs, np.where(info["action_mask"] == 1)[0]])`.
+To sample a modifying action, use `action = env.action_space.sample(info["action_mask"])`. Or with a Q-value based algorithm `action = np.argmax(q_values[obs, np.where(info["action_mask"] == 1)[0]])`.

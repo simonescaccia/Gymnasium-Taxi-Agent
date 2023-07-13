@@ -30,4 +30,4 @@ observation, info = env.reset()
 # sample a random action from all valid actions, not using a Q-value based algorithm 
 action = env.action_space.sample(info["action_mask"])
 print(action)
-# e.g. 
+# e.g. action 3 Move west (left)
