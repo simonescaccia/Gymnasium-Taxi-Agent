@@ -1,6 +1,6 @@
 # Import and create the gymnasium environment
 import gymnasium as gym
-env = gym.make('Taxi-v3', render_mode="rgb_array")
+env = gym.make('Taxi-v3', render_mode="human")
 
 # Reset the environment to get the first observation
 # env.reset() start an episode. This function
@@ -32,8 +32,25 @@ print("Info: ", info)
 # render the enviroment
 env.render()
 
-# sample a random action from all valid actions, not using a Q-value based algorithm 
-action = env.action_space.sample(info["action_mask"])
-print(action)
-print("Action: ", action)
-# e.g. action 3 Move west (left)
+# Execute some random actions in the environment
+num_steps = 100
+for i in range(100):
+    # sample a random action not using a Q-value based algorithm 
+    action = env.action_space.sample()
+    print("Action: ", action)
+    # e.g. action 3 (Move left)
+
+    # perform this action on the environment
+    tuple = env.step(action)
+    print("Observation: ", tuple[0])
+    print("Reward: ", tuple[1])
+    print("Action Mask: ", tuple[4]['action_mask'])
+
+    # print the new state
+    env.render()
+
+    # Sleep for 500 milliseconds
+    import time
+    time.sleep(0.5)
+
+env.close()

@@ -1,29 +1,20 @@
-# Gymnasium-Taxi-Agent
+# Gymnasium Taxi Agent
+
+## 1. Problem Description
 
 The Taxi Problem involves navigating to passengers in a grid world, picking them up and dropping them
 off at one of four locations.
 
-## Documentation
-
-[Gymnasium Taxi documentation](https://gymnasium.farama.org/environments/toy_text/taxi/#taxi_ref)
-
-## Dependencies
-
-```python -m pip install gymnasium```
-```python -m pip install gymnasium[toy-text]```
-
-## Description
+## 1.1. Description of the environment
 
 There are four designated pick-up and drop-off locations (Red, Green, Yellow and Blue) in the
-5x5 grid world. The taxi starts off at a random square and the passenger at one of the
-designated locations.
-
-The goal is move the taxi to the passenger's location, pick up the passenger,
+5x5 grid world. The taxi starts at a random square and the passenger at one of the
+designated locations. The goal is to move the taxi to the passenger's location, pick up the passenger,
 move to the passenger's desired destination, and
 drop off the passenger. Once the passenger is dropped off, the episode ends.
 
-The player receives positive rewards for successfully dropping-off the passenger at the correct
-location. Negative rewards for incorrect attempts to pick-up/drop-off passenger and
+The player receives positive rewards for successfully dropping off the passenger at the correct
+location. Negative rewards for incorrect attempts to pick up/drop off the passenger and
 for each step where another reward is not received.
 
 Map:
@@ -36,25 +27,25 @@ Map:
         |Y| : |B: |
         +---------+
 
-## Action Space
+## 1.2. Action Space
 
 The action shape is `(1,)` in the range `{0, 5}` indicating
-which direction to move the taxi or to pickup/drop off passengers.
+which direction to move the taxi or to pick up/drop off the passenger.
 
 - 0: Move south (down)
 - 1: Move north (up)
 - 2: Move east (right)
 - 3: Move west (left)
 - 4: Pickup passenger
-- 5: Drop off passenger
+- 5: Drop off the passenger
 
-## Observation Space
+## 1.3. Observation Space
 
 There are 500 discrete states since there are 25 taxi positions, 5 possible
 locations of the passenger (including the case when the passenger is in the
 taxi), and 4 destination locations.
 
-Destination on the map are represented with the first letter of the color.
+Destinations on the map are represented with the first letter of the color.
 
 Passenger locations:
 
@@ -62,7 +53,7 @@ Passenger locations:
 - 1: Green
 - 2: Yellow
 - 3: Blue
-- 4: In taxi
+- 4: In the taxi
 
 Destinations:
 
@@ -74,50 +65,65 @@ Destinations:
 An observation is returned as an `int()` that encodes the corresponding state, calculated by
 `((taxi_row * 5 + taxi_col) * 5 + passenger_location) * 4 + destination`
 
-Note that there are 400 states that can actually be reached during an
+Note that there are only 400 states that can be reached during an
 episode. The missing states correspond to situations in which the passenger
 is at the same location as their destination, as this typically signals the
 end of an episode. Four additional states can be observed right after a
-successful episodes, when both the passenger and the taxi are at the destination.
+successful episode when both the passenger and the taxi are at the destination.
 This gives a total of 404 reachable discrete states.
 
-## Starting State
+## 1.4. Starting State
 
 The episode starts with the player in a random state.
 
-## Rewards
+## 1.5. Rewards
 
-- -1 per step unless other reward is triggered.
-- +20 delivering passenger.
+- -1 per step unless another reward is triggered.
+- +20 delivering the passenger.
 - -10  executing "pickup" and "drop-off" actions illegally.
 
-An action that results a noop, like moving into a wall, will incur the time step
+An action that results in a noop (no operation), like moving into a wall, will incur the time step
 penalty. Noops can be avoided by sampling the `action_mask` returned in `info`.
 
-## Episode End
+## 1.6. Episode End
 
 The episode ends if the following happens:
 
 - Termination:
         1. The taxi drops off the passenger.
-
 - Truncation (when using the time_limit wrapper):
         1. The length of the episode is 200.
 
-## Information
+## 1.7. Information
 
 `step()` and `reset()` return a dict with the following keys:
 
-- p - transition proability for the state.
+- p - transition probability for the state.
 - action_mask - if actions will cause a transition to a new state.
 
-As taxi is not stochastic, the transition probability is always 1.0. Implementing
-a transitional probability in line with the Dietterich paper ('The fickle taxi task')
-is a TODO.
-
-For some cases, taking an action will have no effect on the state of the episode.
-In v0.25.0, ``info["action_mask"]`` contains a np.ndarray for each of the actions specifying
+As the taxi is not stochastic, the transition probability is always 1.0.
+In some cases, taking action will not affect the state of the episode.
+In v0.25.0, ``info["action_mask"]`` contains an ``np.ndarray`` for each of the actions specifying
 if the action will change the state.
 
 To sample a modifying action, use ``action = env.action_space.sample(info["action_mask"])``.
 Or with a Q-value based algorithm ``action = np.argmax(q_values[obs, np.where(info["action_mask"] == 1)[0]])``.
+
+## 2. Proposed Solution
+
+The proposed solution is a Q-learning algorithm that uses a neural network to approximate the Q-values.
+
+### Q-learning
+
+In the proposed solution, we will avoid
+
+## Resources
+
+### Documentation
+
+[Gymnasium Taxi documentation](https://gymnasium.farama.org/environments/toy_text/taxi/#taxi_ref)
+
+### Dependencies
+
+```python -m pip install gymnasium```
+```python -m pip install gymnasium[toy-text]```
