@@ -1,6 +1,6 @@
 # Import and create the gymnasium environment
 import gymnasium as gym
-env = gym.make('Taxi-v3')
+env = gym.make('Taxi-v3', render_mode="rgb_array")
 
 # Reset the environment to get the first observation
 # env.reset() start an episode. This function
@@ -9,6 +9,8 @@ env = gym.make('Taxi-v3')
 # is terminated (i.e., the player wins or loses).
 done = False
 observation, info = env.reset()
+print("Observation: ", observation)
+print("Info: ", info)
 
 # e.g. info {'prob': 1.0, 'action_mask': array([0, 1, 1, 0, 0, 0], dtype=int8)}
 # As taxi is not stochastic, the transition probability is always 1.0
@@ -27,7 +29,11 @@ observation, info = env.reset()
 # and the taxi are at the destination. This gives a total of 404 reachable 
 # discrete states.
 
+# render the enviroment
+env.render()
+
 # sample a random action from all valid actions, not using a Q-value based algorithm 
 action = env.action_space.sample(info["action_mask"])
 print(action)
+print("Action: ", action)
 # e.g. action 3 Move west (left)
