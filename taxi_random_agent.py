@@ -49,8 +49,4 @@ for i in range(100):
     # print the new state
     env.render()
 
-    # Sleep for 500 milliseconds
-    import time
-    time.sleep(0.5)
-
 env.close()
