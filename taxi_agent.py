@@ -33,7 +33,7 @@ class TaxiAgent:
 
         self.training_error = []
 
-    def get_action(self, obs: tuple[int, int, bool]) -> int:
+    def get_action(self, state: int) -> int:
         """
         Returns the best action with probability (1 - epsilon)
         otherwise a random action with probability epsilon to ensure exploration.
@@ -44,26 +44,20 @@ class TaxiAgent:
 
         # with probability (1 - epsilon) act greedily (exploit)
         else:
-            return int(np.argmax(self.q_table[obs]))    # best action
+            return int(np.argmax(self.q_table[state]))    # best action
 
     def update(
         self,
-        obs: tuple[int, int, bool],
+        state: int,
         action: int,
         reward: float,
-        terminated: bool,
-        next_obs: tuple[int, int, bool],
+        new_state: int,
+        discount_rate: float
     ):
         """Updates the Q-value of an action."""
-        future_q_value = (not terminated) * np.max(self.q_values[next_obs])
-        temporal_difference = (
-            reward + self.discount_factor * future_q_value - self.q_values[obs][action]
-        )
 
-        self.q_values[obs][action] = (
-            self.q_values[obs][action] + self.lr * temporal_difference
-        )
-        self.training_error.append(temporal_difference)
+        # Qlearning algorithm: Q(s,a) := reward + discount_rate * max Q(s',a')
+        self.q_table[state, action] += reward + discount_rate * np.max(self.q_table[new_state,:])
 
     def decay_epsilon(self):
         # decrease epsilon: prefer exploration first, then exploitation 
