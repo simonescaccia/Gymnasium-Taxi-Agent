@@ -1,3 +1,4 @@
+from collections import defaultdict
 import gymnasium as gym
 import numpy as np
 
@@ -8,8 +9,8 @@ class TaxiAgent:
         initial_epsilon: float,
         epsilon_decay: float,
         final_epsilon: float,
+        discount_factor: float,
         env: gym.Env,
-        discount_factor: float = 0.95
     ):
         """
         Args:
@@ -19,11 +20,10 @@ class TaxiAgent:
             final_epsilon: The final epsilon value
             discount_factor: The discount factor for computing the Q-value
         """
-        state_size = env.observation_space.n  # total number of states (S)
         action_size = env.action_space.n      # total number of actions (A)
 
         # Init Q-table with all zeros
-        self.q_table = np.zeros(state_size, action_size)
+        self.q_table = defaultdict(lambda: np.zeros(action_size))
 
         self.discount_factor = discount_factor
 
@@ -31,7 +31,7 @@ class TaxiAgent:
         self.epsilon_decay = epsilon_decay
         self.final_epsilon = final_epsilon
 
-        self.training_error = []
+        self.env = env
 
     def get_action(self, state: int) -> int:
         """
@@ -51,13 +51,12 @@ class TaxiAgent:
         state: int,
         action: int,
         reward: float,
-        new_state: int,
-        discount_rate: float
+        new_state: int
     ):
         """Updates the Q-value of an action."""
 
-        # Qlearning algorithm: Q(s,a) := reward + discount_rate * max Q(s',a')
-        self.q_table[state, action] += reward + discount_rate * np.max(self.q_table[new_state,:])
+        # Qlearning algorithm: Q(s,a) := reward + discount_factor * max Q(s',a')
+        self.q_table[state, action] = reward + self.discount_factor * np.max(self.q_table[new_state])
 
     def decay_epsilon(self):
         # decrease epsilon: prefer exploration first, then exploitation 
