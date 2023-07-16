@@ -124,7 +124,8 @@ The last one is the least easy to understand, but we can reason as follows:
 
 - Pick a state e.g. taxi_row = 2, taxi_col = 3, passenger_location = 0, destination = 3
 - Compute the encording: ``((2 * 5 + 3) * 5 + 0) * 4 + 3 = 263``
-- Now we revert the encoding. We can observe that ``(263 - destination) mod 4 = 0``, and ``destination`` belongs to ``[0, 3]`` , which means that there aren't two different values of ``destination`` that satisfies ``(263 - destination) mod 4 = 0``. i.e. ``(263 - 0) mod 4 = 3``, ``(263 - 1) mod 4 = 2``, ``(263 - 2) mod 4 = 1``, ``(263 - 3) mod 4 = 0``.
+- Now we revert the encoding starting from the formula ``((taxi_row * 5 + taxi_col) * 5 + passenger_location) * 4 + destination``. 
+We can observe that ``(263 - destination) mod 4 = 0``, and ``destination`` belongs to ``[0, 3]`` , which means that there aren't two different values of ``destination`` that satisfies ``(263 - destination) mod 4 = 0``. i.e. ``(263 - 0) mod 4 = 3``, ``(263 - 1) mod 4 = 2``, ``(263 - 2) mod 4 = 1``, ``(263 - 3) mod 4 = 0``.
 We have found that ``difference = 3`` and ``(taxi_row * 5 + taxi_col) * 5 + passenger_location = 65``. Using the same reasoning we can find: ``(65 - 0) % 5 = 0``, so ``passenger_location = 0``, then ``(13 - 3) % 5 = 0``, so ``taxi_col = 3``, and finally ``10 / 5 = 2``, so ``taxi_row = 2``.
 
 ## Resources
