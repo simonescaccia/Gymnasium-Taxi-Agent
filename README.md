@@ -160,8 +160,7 @@ Also, we can print the optimal policy using an heatmap like this:
 ![heatmap](./img/heatmap.png)
 
 Finally, the agent following this optimal policy will act as follows:
-
-<video src="./img/agent.mp4"></video>
+![agent_video](https://github.com/simonescaccia/Gymnasium-Taxi-Agent/blob/main/img/agent.mp4)
 
 ## Resources
 
