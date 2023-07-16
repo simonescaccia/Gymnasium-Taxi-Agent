@@ -21,9 +21,10 @@ class TaxiAgent:
             discount_factor: The discount factor for computing the Q-value
         """
         action_size = env.action_space.n      # total number of actions (A)
+        state_size = env.observation_space.n  # total number of states (S)
 
         # Init Q-table with all zeros
-        self.q_table = defaultdict(lambda: np.zeros(action_size))
+        self.q_table = np.zeros((state_size,action_size))
 
         self.discount_factor = discount_factor
 
