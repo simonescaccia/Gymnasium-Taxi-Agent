@@ -128,6 +128,40 @@ The last one is the least easy to understand, but we can reason as follows:
 We can observe that ``(263 - destination) mod 4 = 0``, and ``destination`` belongs to ``[0, 3]`` , which means that there aren't two different values of ``destination`` that satisfies ``(263 - destination) mod 4 = 0``. i.e. ``(263 - 0) mod 4 = 3``, ``(263 - 1) mod 4 = 2``, ``(263 - 2) mod 4 = 1``, ``(263 - 3) mod 4 = 0``.
 We have found that ``difference = 3`` and ``(taxi_row * 5 + taxi_col) * 5 + passenger_location = 65``. Using the same reasoning we can find: ``(65 - 0) % 5 = 0``, so ``passenger_location = 0``, then ``(13 - 3) % 5 = 0``, so ``taxi_col = 3``, and finally ``10 / 5 = 2``, so ``taxi_row = 2``.
 
+#### 2.1.2 The Taxi Agent
+
+The agent is responsible of computing the new value for a q-table after executing an action on the enviroment. Indeed, the environment returns to the agent the reward of the action and the next state. The new value of the q-table is the following:
+$$Q_{table}(state, action) = reward + discoun\_factor * max_{action'}(Q_{table}(next\_state, action'))$$
+
+The ``discount\_factor`` is useful to increase the value of close rewards instead of future rewards.
+
+The action is choosen considering the trade-off between exporation vs exploitation. At the start we want to explore the environment by chosing random action and collecting rewards, then we want to exploit the action which give us the best rewards. So, by using a variable ``epsilon = 1``, we choose a random action with probability ``epsilon`` and we exploit the action with the maximum reward with probability ``1 - epsilon``. After completing an episode we descrease ``epsilon`` in order to facilitate exploitation.
+
+#### 2.1.3 Training the Taxi Agent
+
+In the training phase we repeat, for a fixed number of times called episodes, the following:
+
+- Choose the action
+- Compute the action in the environment
+- Collect the reward by updating the q-table
+- If the episode terminate by completing the goal, or reach the maximum number of actions which is 200, it stops.
+
+After an episode, the ``epsilon`` is decreased.
+
+#### 2.1.4 Evaluation
+
+During the training we collect some statistics with the help of the environment to evaluate how fast the learning is. Two indicators of the learning are the cumulative rewards during the episodes, and the episode lenght. In order to make this two graphs smoother, we use a rolling average by computing an average for near episodes.
+
+Training the agent with 1000 episodes, that lasts about 2 seconds, the two graphs are:
+![stats](./img/stats.png)
+We can see that after 100 episodes, the episode lenght decrease drastically up to 400 episodes.
+
+Also, we can print the optimal policy using an heatmap like this:
+![heatmap](./img/heatmap.png)
+
+Finally, the agent following this optimal policy will act as follows:
+![agent_video](./img/agent.mp4)
+
 ## Resources
 
 ### Documentation
