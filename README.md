@@ -67,7 +67,7 @@ An observation is returned as an `int()` that encodes the corresponding state, c
 
 Note that there are only 400 states that can be reached during an
 episode. The missing states correspond to situations in which the passenger
-is at the same location as their destination, as this typically signals the
+is at the exact location as their destination, as this typically signals the
 end of an episode. Four additional states can be observed right after a
 successful episode when both the passenger and the taxi are at the destination.
 This gives a total of 404 reachable discrete states.
@@ -115,27 +115,27 @@ We will use a Q-learning algorithm that uses a neural network to approximate the
 
 ### 2.1 Q-learning
 
-#### 2.1.1 Initial considertions
+#### 2.1.1 Initial considerations
 
 In the proposed solution, we will avoid the facilities provided by the Gymnasium environment to avoid the agent to take bad actions. Indeed, using ``info["action_mask"]`` to choose the next action, it is possible to avoid 'Pickup passenger' and 'Drop off the passenger' actions when they are not possible. As a consequence, our agent can receive the negative reward -10 by executing "pickup" and "drop-off" actions illegally.
 
-An other consideration is about the encoding of the state. We can observe that for each state (taxi_row, taxi_col, passenger_location, destination) there is only one possible encoding following the formula above and viceversa, starting from the encoding we can exactly establish the state (taxi_row, taxi_col, passenger_location, destination).
+Another consideration is the encoding of the state. We can observe that for each state (taxi_row, taxi_col, passenger_location, destination) there is only one possible encoding following the formula above and vice versa, starting from the encoding we can exactly establish the state (taxi_row, taxi_col, passenger_location, destination).
 The last one is the least easy to understand, but we can reason as follows:
 
 - Pick a state e.g. taxi_row = 2, taxi_col = 3, passenger_location = 0, destination = 3
-- Compute the encording: ``((2 * 5 + 3) * 5 + 0) * 4 + 3 = 263``
+- Compute the encoding: ``((2 * 5 + 3) * 5 + 0) * 4 + 3 = 263``
 - Now we revert the encoding starting from the formula ``((taxi_row * 5 + taxi_col) * 5 + passenger_location) * 4 + destination``. 
 We can observe that ``(263 - destination) mod 4 = 0``, and ``destination`` belongs to ``[0, 3]`` , which means that there aren't two different values of ``destination`` that satisfies ``(263 - destination) mod 4 = 0``. i.e. ``(263 - 0) mod 4 = 3``, ``(263 - 1) mod 4 = 2``, ``(263 - 2) mod 4 = 1``, ``(263 - 3) mod 4 = 0``.
 We have found that ``difference = 3`` and ``(taxi_row * 5 + taxi_col) * 5 + passenger_location = 65``. Using the same reasoning we can find: ``(65 - 0) % 5 = 0``, so ``passenger_location = 0``, then ``(13 - 3) % 5 = 0``, so ``taxi_col = 3``, and finally ``10 / 5 = 2``, so ``taxi_row = 2``.
 
 #### 2.1.2 The Taxi Agent
 
-The agent is responsible of computing the new value for a q-table after executing an action on the enviroment. Indeed, the environment returns to the agent the reward of the action and the next state. The new value of the q-table is the following:
+The agent is responsible for computing the new value for a q-table after executing an action on the environment. Indeed, the environment returns to the agent the reward of the action and the next state. The new value of the q-table is the following:
 $$Q_{table}(state, action) = reward + discoun\_factor * max_{action'}(Q_{table}(next\_state, action'))$$
 
 The ``discount\_factor`` is useful to increase the value of close rewards instead of future rewards.
 
-The action is choosen considering the trade-off between exporation vs exploitation. At the start we want to explore the environment by chosing random action and collecting rewards, then we want to exploit the action which give us the best rewards. So, by using a variable ``epsilon = 1``, we choose a random action with probability ``epsilon`` and we exploit the action with the maximum reward with probability ``1 - epsilon``. After completing an episode we descrease ``epsilon`` in order to facilitate exploitation.
+The action is chosen considering the trade-off between exploration and exploitation. At the start we want to explore the environment by choosing random acts and collecting rewards, then we want to exploit the action which gives us the best rewards. So, by using a variable ``epsilon = 1``, we choose a random action with probability ``epsilon`` and we exploit the action with the maximum reward with probability ``1 - epsilon``. After completing an episode we decrease ``epsilon`` to facilitate exploitation.
 
 #### 2.1.3 Training the Taxi Agent
 
@@ -144,19 +144,19 @@ In the training phase we repeat, for a fixed number of times called episodes, th
 - Choose the action
 - Compute the action in the environment
 - Collect the reward by updating the q-table
-- If the episode terminate by completing the goal, or reach the maximum number of actions which is 200, it stops.
+- If the episode terminates by completing the goal, or reaching the maximum number of actions which is 200, it stops.
 
 After an episode, the ``epsilon`` is decreased.
 
 #### 2.1.4 Evaluation
 
-During the training we collect some statistics with the help of the environment to evaluate how fast the learning is. Two indicators of the learning are the cumulative rewards during the episodes, and the episode lenght. In order to make this two graphs smoother, we use a rolling average by computing an average for near episodes.
+During the training, we collect some statistics with the help of the environment to evaluate how fast the learning is. Two indicators of learning are the cumulative rewards during the episodes and the episode length. To make these two graphs smoother, we use a rolling average by computing an average for near episodes.
 
-Training the agent with 1000 episodes, that lasts about 2 seconds, the two graphs are:
+Training the agent with 1000 episodes, which lasts about 2 seconds, the two graphs are:
 ![stats](./img/stats.png)
-We can see that after 100 episodes, the episode lenght decrease drastically up to 400 episodes.
+We can see that after 100 episodes, the episode length decreases drastically up to 400 episodes.
 
-Also, we can print the optimal policy using an heatmap like this:
+Also, we can print the optimal policy using a heatmap like this:
 ![heatmap](./img/heatmap.png)
 
 Finally, the agent following this optimal policy will act as follows:
