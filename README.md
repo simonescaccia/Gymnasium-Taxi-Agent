@@ -160,7 +160,7 @@ Also, we can print the optimal policy using an heatmap like this:
 ![heatmap](./img/heatmap.png)
 
 Finally, the agent following this optimal policy will act as follows:
-![agent_video](./img/agent.mp4)
+<video src="./img/agent.mp4">
 
 ## Resources
 
