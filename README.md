@@ -163,6 +163,10 @@ Finally, the agent following this optimal policy will act as follows:
 
 https://github.com/simonescaccia/Gymnasium-Taxi-Agent/assets/72872543/78e18c01-2bda-469f-bf5e-abe0f9c835ff
 
+### 2.2 Deep Q-learning
+
+
+
 ## Resources
 
 ### Documentation
@@ -171,5 +175,5 @@ https://github.com/simonescaccia/Gymnasium-Taxi-Agent/assets/72872543/78e18c01-2
 
 ### Dependencies
 
-```python -m pip install gymnasium```
-```python -m pip install gymnasium[toy-text]```
+        python -m pip install gymnasium
+        python -m pip install gymnasium[toy-text]
