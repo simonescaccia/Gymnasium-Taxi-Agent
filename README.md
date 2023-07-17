@@ -161,7 +161,7 @@ Also, we can print the optimal policy using a heatmap like this:
 
 Finally, the agent following this optimal policy will act as follows:
 
-https://github.com/simonescaccia/Gymnasium-Taxi-Agent/assets/72872543/903b7097-6832-447a-9db9-42cfd5718ab7
+https://github.com/simonescaccia/Gymnasium-Taxi-Agent/assets/72872543/78e18c01-2bda-469f-bf5e-abe0f9c835ff
 
 ## Resources
 
