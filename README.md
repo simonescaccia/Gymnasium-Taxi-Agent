@@ -165,15 +165,15 @@ https://github.com/simonescaccia/Gymnasium-Taxi-Agent/assets/72872543/78e18c01-2
 
 ### 2.2 Deep Q-learning
 
+We use a deep neural network to approximate the Q-values.
 
+## 3 Resources
 
-## Resources
-
-### Documentation
+### 3.1 Documentation
 
 [Gymnasium Taxi documentation](https://gymnasium.farama.org/environments/toy_text/taxi/#taxi_ref)
 
-### Dependencies
+### 3.2 Dependencies
 
         python -m pip install gymnasium
         python -m pip install gymnasium[toy-text]
