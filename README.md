@@ -161,9 +161,7 @@ Also, we can print the optimal policy using a heatmap like this:
 
 Finally, the agent following this optimal policy will act as follows:
 
-<video width="320" height="240">
-  <source src="./img/agent.mp4" type="video/mp4">
-</video>
+https://github.com/simonescaccia/Gymnasium-Taxi-Agent/assets/72872543/903b7097-6832-447a-9db9-42cfd5718ab7
 
 ## Resources
 
