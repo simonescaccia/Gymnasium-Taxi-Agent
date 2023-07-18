@@ -148,7 +148,15 @@ In the training phase we repeat, for a fixed number of times called episodes, th
 
 After an episode, the ``epsilon`` is decreased.
 
-#### 2.1.4 Evaluation
+#### 2.1.4 Hyperparameters
+
+- n_episodes = 1000
+- start_epsilon = 1.0
+- epsilon_decay = start_epsilon / (n_episodes / 2)
+- final_epsilon = 0.1
+- discount_factor = 0.95
+
+#### 2.1.5 Evaluation
 
 During the training, we collect some statistics with the help of the environment to evaluate how fast the learning is. Two indicators of learning are the cumulative rewards during the episodes and the episode length. To make these two graphs smoother, we use a rolling average by computing an average for near episodes.
 
