@@ -10,19 +10,21 @@ import seaborn as sns
 
 # SETTINGS
 DEBUG = False
+IS_SARSA = True
 TRAIN_AGENT = True
-SAVE_TRAINING = False
+SAVE_TRAINING = True
 PLOT_STATS = True
 PLOT_POLICY = True
 SHOW_AGENT_IN_ACTION = True
 REPEAT_AGENT_IN_ACTION = 5
 
 # hyperparameters
-n_episodes = 1000
+n_episodes = 10000
 start_epsilon = 1.0
 epsilon_decay = start_epsilon / (n_episodes / 2)  # reduce the exploration over time
 final_epsilon = 0.1
 discount_factor = 0.95
+learning_rate = 0.1
 
 def train_agent(env, agent):
     # Train the agent
@@ -37,7 +39,10 @@ def train_agent(env, agent):
             next_obs, reward, terminated, truncated, _ = env.step(action)
 
             # update the agent
-            agent.update(state=obs, action=action, reward=reward, new_state=next_obs)
+            if IS_SARSA:
+                agent.update_sarsa(state=obs, action=action, reward=reward, new_state=next_obs)
+            else:
+                agent.update(state=obs, action=action, reward=reward, new_state=next_obs)
 
             # update if the environment is done and the current obs
             done = terminated or truncated
@@ -47,7 +52,12 @@ def train_agent(env, agent):
 
     if SAVE_TRAINING:
         # Save the q_table
-        np.save("q_table_{}.npy".format(n_episodes), agent.q_table)
+        np.save("q_table_{}_{}.npy".format(
+            "sarsa" if IS_SARSA else "" ,
+            n_episodes
+            ), 
+            agent.q_table
+        )
 
 def plot_stats():
     # Plot the training statistics
@@ -156,6 +166,7 @@ if __name__ == "__main__":
         epsilon_decay=epsilon_decay,
         final_epsilon=final_epsilon,
         discount_factor=discount_factor,
+        learning_rate=learning_rate,
         env=env,
     )
 

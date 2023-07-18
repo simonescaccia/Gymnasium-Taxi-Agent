@@ -130,8 +130,11 @@ We have found that ``difference = 3`` and ``(taxi_row * 5 + taxi_col) * 5 + pass
 
 #### 2.1.2 The Taxi Agent
 
-The agent is responsible for computing the new value for a q-table after executing an action on the environment. Indeed, the environment returns to the agent the reward of the action and the next state. The new value of the q-table is the following:
+The agent is responsible for computing the new value for a q-table after executing an action on the environment. Indeed, the environment returns to the agent the reward of the action and the next state. The new value of the q-table for the basic q-learning algorithm is computed as follows:
 $$Q_{table}(state, action) = reward + discoun\_factor * max_{action'}(Q_{table}(next\_state, action'))$$
+
+For the SARSA algorithm, the new value of the q-table is computed as follows:
+$$Q_{table}(state, action) = Q_{table}(state, action) + learning\_rate * (reward + discoun\_factor * * max_{action'}(Q_{table}(next\_state, action')) - Q_{table}(state, action))$$
 
 The ``discount_factor`` is useful to increase the value of close rewards instead of future rewards.
 
@@ -155,8 +158,9 @@ After an episode, the ``epsilon`` is decreased.
 - epsilon_decay = start_epsilon / (n_episodes / 2)
 - final_epsilon = 0.1
 - discount_factor = 0.95
+- learning_rate = 0.1
 
-#### 2.1.5 Evaluation
+#### 2.1.5 Evaluation Basic Q-learning
 
 During the training, we collect some statistics with the help of the environment to evaluate how fast the learning is. Two indicators of learning are the cumulative rewards during the episodes and the episode length. To make these two graphs smoother, we use a rolling average by computing an average for near episodes.
 
@@ -171,13 +175,15 @@ Finally, the agent following this optimal policy will act as follows:
 
 https://github.com/simonescaccia/Gymnasium-Taxi-Agent/assets/72872543/78e18c01-2bda-469f-bf5e-abe0f9c835ff
 
+#### 2.1.6 Evaluation SARSA Q-learning
+
 ### 2.2 Deep Q-learning
 
 We use a neural network to approximate the Q-values. A q-table requires a lot of space, in our case we have a q-table of 500 states * 6 actions = 3000 entries, also we need a lot of iteration in Q-learning to visit these entries many times.
 
 #### 2.2.1 Neural Network Architecture
 
-- Target function f: X -> R<sup>|Y|</sup>, X set of states, Y set of actions. So, the output of the network is a vector of q-values, one for each action.
+- Target function f: (s,a) -> Q(s,a)
 - Input layer:  
 
 ## 3 Resources

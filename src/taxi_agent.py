@@ -10,6 +10,7 @@ class TaxiAgent:
         epsilon_decay: float,
         final_epsilon: float,
         discount_factor: float,
+        learning_rate: float,
         env: gym.Env,
     ):
         """
@@ -31,6 +32,8 @@ class TaxiAgent:
         self.epsilon = initial_epsilon
         self.epsilon_decay = epsilon_decay
         self.final_epsilon = final_epsilon
+
+        self.learning_rate = learning_rate
 
         self.env = env
 
@@ -58,6 +61,17 @@ class TaxiAgent:
 
         # Qlearning algorithm: Q(s,a) := reward + discount_factor * max Q(s',a')
         self.q_table[state, action] = reward + self.discount_factor * np.max(self.q_table[new_state])
+
+    def update_sarsa(
+        self,
+        state: int,
+        action: int,
+        reward: float,
+        new_state: int,
+    ):
+        # SARSA Qlearning algorithm: Q(s,a) = Q(s,a) + learning_rate * (reward + discount_factor * max Q(s',a') - Q(s,a))
+
+        self.q_table[state, action] = self.q_table[state, action] + self.learning_rate * (reward + self.discount_factor * np.max(self.q_table[new_state]) - self.q_table[state, action])
 
     def decay_epsilon(self):
         # decrease epsilon: prefer exploration first, then exploitation 
