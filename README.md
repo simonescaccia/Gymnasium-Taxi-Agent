@@ -169,10 +169,12 @@ During the training, we collect some statistics with the help of the environment
 ##### Basic Q-learning
 
 Training the agent with 1000 episodes, which lasts about 2 seconds, the two graphs are:
+
 ![stats](./img/stats.png)
 We can see that after 100 episodes, the episode length decreases drastically up to 400 episodes.
 
 Also, we can print the optimal policy using a heatmap like this:
+
 ![heatmap](./img/heatmap.png)
 
 Finally, the agent following this optimal policy will act as follows:
@@ -182,6 +184,7 @@ https://github.com/simonescaccia/Gymnasium-Taxi-Agent/assets/72872543/78e18c01-2
 ##### SARSA Q-learning
 
 In SARSA Q-learning, the agent learns more slowly than the basic Q-learning due to the introduction of the learning rate. Using the same hyperparameters, the learning rate equals 0.1 and 10000 episodes, the two graphs are:
+
 ![stats_sarsa](./img/stats_sarsa.png)
 
 ### 2.2 Deep Q-learning
