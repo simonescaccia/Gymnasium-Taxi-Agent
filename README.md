@@ -169,7 +169,7 @@ We use a neural network to approximate the Q-values. A q-table requires a lot of
 
 #### 2.2.1 Neural Network Architecture
 
-- Target function f: ``X -> R<sup>|Y|</sup>``, X set of states, Y set of actions. So, the output of the network is a vector of q-values, one for each action.
+- Target function f: X -> R<sup>|Y|</sup>, X set of states, Y set of actions. So, the output of the network is a vector of q-values, one for each action.
 - Input layer:  
 
 ## 3 Resources
