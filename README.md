@@ -131,12 +131,14 @@ We have found that ``difference = 3`` and ``(taxi_row * 5 + taxi_col) * 5 + pass
 #### 2.1.2 The Taxi Agent
 
 The agent is responsible for computing the new value for a q-table after executing an action on the environment. Indeed, the environment returns to the agent the reward of the action and the next state. The new value of the q-table for the basic q-learning algorithm is computed as follows:
-$$Q_{table}(state, action) = reward + discoun\_factor * max_{action'}(Q_{table}(next\_state, action'))$$
+$$Q_{table}(state, action) = reward + discoun_factor * max_{action'}(Q_{table}(next_state, action'))$$
 
 For the SARSA algorithm, the new value of the q-table is computed as follows:
-$$Q_{table}(state, action) = Q_{table}(state, action) + learning\_rate * (reward + discoun\_factor * * max_{action'}(Q_{table}(next\_state, action')) - Q_{table}(state, action))$$
+$$Q_{table}(state, action) = Q_{table}(state, action) + learning_rate * (reward + discoun_factor * * max_{action'}(Q_{table}(next_state, action')) - Q_{table}(state, action))$$
 
 The ``discount_factor`` is useful to increase the value of close rewards instead of future rewards.
+
+The ``learning_rate`` determines how acquired information overrides old information.
 
 The action is chosen considering the trade-off between exploration and exploitation. At the start we want to explore the environment by choosing random acts and collecting rewards, then we want to exploit the action which gives us the best rewards. So, by using a variable ``epsilon = 1``, we choose a random action with probability ``epsilon`` and we exploit the action with the maximum reward with probability ``1 - epsilon``. After completing an episode we decrease ``epsilon`` to facilitate exploitation.
 
@@ -160,9 +162,11 @@ After an episode, the ``epsilon`` is decreased.
 - discount_factor = 0.95
 - learning_rate = 0.1
 
-#### 2.1.5 Evaluation Basic Q-learning
+#### 2.1.5 Evaluation
 
 During the training, we collect some statistics with the help of the environment to evaluate how fast the learning is. Two indicators of learning are the cumulative rewards during the episodes and the episode length. To make these two graphs smoother, we use a rolling average by computing an average for near episodes.
+
+##### Basic Q-learning
 
 Training the agent with 1000 episodes, which lasts about 2 seconds, the two graphs are:
 ![stats](./img/stats.png)
@@ -175,7 +179,10 @@ Finally, the agent following this optimal policy will act as follows:
 
 https://github.com/simonescaccia/Gymnasium-Taxi-Agent/assets/72872543/78e18c01-2bda-469f-bf5e-abe0f9c835ff
 
-#### 2.1.6 Evaluation SARSA Q-learning
+##### SARSA Q-learning
+
+In SARSA Q-learning, the agent learns more slowly than the basic Q-learning due to the introduction of the learning rate. Using the same hyperparameters, the learning rate equals 0.1 and 10000 episodes, the two graphs are:
+![stats_sarsa](./img/stats_sarsa.png)
 
 ### 2.2 Deep Q-learning
 
