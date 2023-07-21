@@ -193,8 +193,40 @@ We use a neural network to approximate the Q-values. A q-table requires a lot of
 
 #### 2.2.1 Neural Network Architecture
 
-- Target function f: (s,a) -> Q(s,a)
-- Input layer:  
+- Target function f: (s, a) -> Q(s, a)
+- Input layer: 64 neurons, using the ReLU activation function.
+- Hidden layer: one layer with 64 neurons, using the ReLU activation function.  
+- Output layer: one neuron, using the linear activation function.
+
+#### 2.2.2 hyperparameters
+
+- experience_max_size = 10000
+- batch_size = experience_max_size // 10
+
+They define the size of the experience buffer and the size of the batch used to train the neural network.
+
+- start_epsilon = 0.7
+- final_epsilon = 0.3
+
+Epsilon is used to choose the action, as in the basic Q-learning algorithm.
+
+- discount_factor = 0.95
+
+The discount factor penalizes future rewards.
+
+- scale_range_x = (-0.5, 0.5)
+
+To avoid large numbers on the weights of the neural network, and therefore to avoid large numbers in the Q-values, we scale the input values in the range ``(-0.5, 0.5)``.
+
+#### 2.2.3 Training the Taxi Agent
+
+We repeatedly execute the following steps for each episode:
+
+- Choose the action: with probability ``epsilon`` we choose a random action, otherwise we choose the action with the maximum Q-value.
+- Compute the action in the environment: we collect the reward and the next state.
+- We compute the Q-value of the next state using the neural network.
+- We store the experience in the experience buffer.
+- We sample a batch of experiences from the experience buffer and we train the neural network.
 
 ## 3 Resources
 

@@ -19,14 +19,14 @@ SHOW_AGENT_IN_ACTION = True
 REPEAT_AGENT_IN_ACTION = 5
 
 # hyperparameters
-n_episodes = 10000
+n_episodes = 100000
 start_epsilon = 1.0
 epsilon_decay = start_epsilon / (n_episodes / 2)  # reduce the exploration over time
 final_epsilon = 0.1
 discount_factor = 0.95
-learning_rate = 0.1
+learning_rate = 0.01
 
-def train_agent(env, agent):
+def train_agent(env, agent: TaxiAgent):
     # Train the agent
     print("Training the agent...")
     for _ in tqdm(range(n_episodes)):
@@ -52,8 +52,8 @@ def train_agent(env, agent):
 
     if SAVE_TRAINING:
         # Save the q_table
-        np.save("q_table_{}_{}.npy".format(
-            "sarsa" if IS_SARSA else "" ,
+        np.save("q-tables/q_table_{}{}.npy".format(
+            "sarsa_" if IS_SARSA else "" ,
             n_episodes
             ), 
             agent.q_table
