@@ -210,19 +210,20 @@ But computing the training, with 10000 epochs, we can see that the loss function
 Also in this case there are some problems like computing the training, which requires a lot of time doing the predictions for each action, and the reward convergence, which is not stable. So, we change our approach by using a neural network to approximate the Q-values directly, but we use a neural network with the output layer that contains one neuron per action (taxi_DQN3.py):
 
 - Target function f: s -> Q(s, a)^|A|
-- Input layer: 64 neurons, using the ReLU activation function.
-- Hidden layer: one layer with 64 neurons, using the ReLU activation function.
+- Input layer: 256 neurons, using the ReLU activation function.
+- Hidden layer: one layer with 256 neurons, using the ReLU activation function.
 - Output layer: 6 neurons, using the linear activation function.
 
 #### 2.2.2 hyperparameters
 
-- experience_max_size = 10000
-- batch_size = experience_max_size // 10
+- experience_max_size = 4000
+- batch_size = 200
 
 They define the size of the experience buffer and the size of the batch used to train the neural network.
 
-- start_epsilon = 0.7
-- final_epsilon = 0.3
+- start_epsilon = 0.9
+- epsilon_divider = 2000
+- final_epsilon = 0.1
 
 Epsilon is used to choose the action, as in the basic Q-learning algorithm.
 
@@ -243,6 +244,8 @@ We repeatedly execute the following steps for each episode:
 - We compute the Q-value of the next state using the neural network.
 - We store the experience in the experience buffer.
 - We sample a batch of experiences from the experience buffer and we train the neural network.
+
+The worst case in training is when you reach the maximum number of actions, which is 200, and the reward is -200 which means that the agent has not completed the goal, but it has done only movements. In this case, the neural network is blocked in a local minimum.
 
 ## 3 Resources
 

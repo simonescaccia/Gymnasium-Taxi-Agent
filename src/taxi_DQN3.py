@@ -11,16 +11,15 @@ import gymnasium as gym
 
 
 # hyperparameters
-experience_max_size = 2000 # Max batch size of past experience
-batch_size = 100 # Training set size
+experience_max_size = 4000 # Max batch size of past experience
+batch_size = 200 # Training set size
 experience = deque([], experience_max_size) # Past experience arranged as a queue
 start_epsilon = 0.9
+epsilon_divider = 2000 
 final_epsilon = 0.1
 discount_factor = 0.95
-episode_reward = 0
-episode_check = 1
-neuron_first_layer = 64
-neuron_second_layer = 64
+neuron_first_layer = 256
+neuron_second_layer = 256
 scale_range_x = (-0.5, 0.5)
 
 # SETTINGS
@@ -46,6 +45,7 @@ if RENDER:
 else:
     env = gym.make('Taxi-v3')
 
+episode_reward = 0
 episode_number = 1
 # setup the environment
 obs, _ = env.reset()
@@ -83,7 +83,9 @@ def train_model(model: Sequential, experience):
 
         # decrease epsilon: prefer exploration first, then exploitation
         global epsilon
-        epsilon = max(final_epsilon, epsilon - epsilon/1000)
+        epsilon = max(final_epsilon, epsilon - epsilon/epsilon_divider)
+
+        return model
 
 while(True):
     action = choose_action(obs)
@@ -109,7 +111,9 @@ while(True):
     experience.append(new_experience)
 
     # train the model
-    train_model(model, experience)
+    new_model = train_model(model, experience)
+    if new_model is not None:
+        model = new_model
 
     obs = next_obs
 
