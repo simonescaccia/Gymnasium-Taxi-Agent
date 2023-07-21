@@ -12,13 +12,13 @@ np.set_printoptions(threshold=sys.maxsize)
 # SETTINGS
 TRAIN_MODEL = True         # train the model from q-table or load weights
 SARSA_TRAINING = False      # use SARSA Q-learning
-N_EPISODES = 100000
+N_EPISODES = 10000
 N_TEST_EPISODES = 5
 TEST_MODEL = True
 FILE_POSTFIX = "_" + ("sarsa_" if SARSA_TRAINING else "") + str(N_EPISODES)
 
 # hyperparameters
-n_epochs = 10000
+n_epochs = 1000
 batch_size = 100
 learning_rate = 0.01
 scale_range_x = (-0.5, 0.5)
@@ -83,7 +83,6 @@ def test_model(model: Sequential, env):
             x_test = x_test.reshape(len(x_test), 2)
             # scale the data
             x_test = scale_x.transform(x_test)
-            print(x_test)
 
             # predict the q-values    
             y_pred = model.predict(x_test, verbose=0)
@@ -101,8 +100,8 @@ def test_model(model: Sequential, env):
 if "__main__" == __name__:
     # NN architecture using TensorFlow
     model = Sequential()
-    model.add(Dense(100, input_shape=(2,), activation='relu'))
-    model.add(Dense(1000, activation='relu'))
+    model.add(Dense(10, input_shape=(2,), activation='relu'))
+    model.add(Dense(10, activation='relu'))
     model.add(Dense(1, activation='linear'))
 
     optimizer = keras.optimizers.SGD(learning_rate=learning_rate)

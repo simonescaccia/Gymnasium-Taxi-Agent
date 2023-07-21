@@ -1,15 +1,37 @@
+# array of 6 rewards
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
 
 
-scale_x = MinMaxScaler()
-# create a random array with values between 0 and 499
-x = np.array([[0, 499]]).reshape(-1, 1)
-# fit the scaler
-scale_x = scale_x.fit(x)
+my_rewards = np.array([1, 2, 3, 4, 5, 6])
+print(my_rewards)
+
+all_rewards = np.array([[]])
+# new array
+new_rewards = np.array([])
+# append to new array 10
+new_rewards = np.append(new_rewards, [10])
+print(new_rewards)
+
+# for each reward in my_rewards append to new_rewards
+for reward in my_rewards:
+    new_rewards = np.append(new_rewards, [reward])
+
+print(new_rewards)
+# append new_rewards to all_rewards
+all_rewards = np.append(all_rewards, [new_rewards]).reshape(-1, 7)
+print(all_rewards)
+
+print("obs: ", all_rewards[:,0])
+print("reward: ", all_rewards[:,1:7])
 
 
-# scale the data
-y = np.array([[0]])
-y = scale_x.transform(y)
-print(y)
+epsilon = 1
+
+def decrease():
+    # decrease epsilon: prefer exploration first, then exploitation
+    global epsilon
+    epsilon = max(0.1, epsilon - epsilon/100)
+
+print(epsilon)
+decrease()
+print(epsilon)

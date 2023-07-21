@@ -10,7 +10,7 @@ import seaborn as sns
 
 # SETTINGS
 DEBUG = False
-IS_SARSA = True
+IS_SARSA = False
 TRAIN_AGENT = True
 SAVE_TRAINING = True
 PLOT_STATS = True
@@ -19,7 +19,7 @@ SHOW_AGENT_IN_ACTION = True
 REPEAT_AGENT_IN_ACTION = 5
 
 # hyperparameters
-n_episodes = 100000
+n_episodes = 10000
 start_epsilon = 1.0
 epsilon_decay = start_epsilon / (n_episodes / 2)  # reduce the exploration over time
 final_epsilon = 0.1

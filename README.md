@@ -193,10 +193,26 @@ We use a neural network to approximate the Q-values. A q-table requires a lot of
 
 #### 2.2.1 Neural Network Architecture
 
+On the first try, we would like to use a neural network to approximate the Q-values already computed by the q-table. So, we use the same input and output of the q-table, but we use a neural network to approximate the Q-values. The neural network has the following architecture (taxi_DQN.py):
+
+- Target function f: (s, a) -> Q(s, a)
+- Input layer: 10 neurons, using the ReLU activation function.
+- Hidden layer: one layer with 10 neurons, using the ReLU activation function.  
+- Output layer: one neuron, using the linear activation function.
+
+But computing the training, with 10000 epochs, we can see that the loss function is stuck at a value of 0.00265, and the agent doesn't learn anything. So, we change our approach by using a neural network to approximate the Q-values directly. Our approach will use the following architecture (taxi_DQN2.py):
+
 - Target function f: (s, a) -> Q(s, a)
 - Input layer: 64 neurons, using the ReLU activation function.
 - Hidden layer: one layer with 64 neurons, using the ReLU activation function.  
 - Output layer: one neuron, using the linear activation function.
+
+Also in this case there are some problems like computing the training, which requires a lot of time doing the predictions for each action, and the reward convergence, which is not stable. So, we change our approach by using a neural network to approximate the Q-values directly, but we use a neural network with the output layer that contains one neuron per action (taxi_DQN3.py):
+
+- Target function f: s -> Q(s, a)^|A|
+- Input layer: 64 neurons, using the ReLU activation function.
+- Hidden layer: one layer with 64 neurons, using the ReLU activation function.
+- Output layer: 6 neurons, using the linear activation function.
 
 #### 2.2.2 hyperparameters
 
