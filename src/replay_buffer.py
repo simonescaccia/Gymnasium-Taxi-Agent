@@ -7,7 +7,7 @@ class ReplayBuffer(object):
         self.mem_size = max_size    # maximum number of entry in the buffer
         self.state_memory = np.zeros(self.mem_size)  # contains the state
         self.new_state_memory = np.zeros(self.mem_size) # contains the new state
-        self.action_memory = np.zeros(self.mem_size)    # contains the action
+        self.action_memory = np.zeros(self.mem_size, dtype=int)    # contains the action
         self.reward_memory = np.zeros(self.mem_size)    # contains the reward
 
     def store_transition(self, state, action, reward, new_state):

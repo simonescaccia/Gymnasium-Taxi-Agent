@@ -15,7 +15,7 @@ experience_max_size = 4000 # Max batch size of past experience
 batch_size = 200 # Training set size
 experience = deque([], experience_max_size) # Past experience arranged as a queue
 start_epsilon = 0.9
-epsilon_divider = 2000 
+epsilon_divider = 5000 
 final_epsilon = 0.1
 discount_factor = 0.95
 neuron_first_layer = 256
@@ -97,7 +97,7 @@ while(True):
 
     # store the experience, use deterministic Q-learning
     # compute the best action for the next state
-    x_test = np.array([obs]).reshape(-1, 1)
+    x_test = np.array([next_obs]).reshape(-1, 1)
     next_reward = (model.predict(x_test, verbose=0))    # best reward
 
 	# Record experience (will be used to train network)
