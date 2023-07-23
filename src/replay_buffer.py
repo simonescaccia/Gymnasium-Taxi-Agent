@@ -28,3 +28,6 @@ class ReplayBuffer(object):
         new_states = self.new_state_memory[batch]
 
         return states, actions, rewards, new_states
+    
+    def get_transitions(self):
+        return self.state_memory, self.action_memory, self.reward_memory, self.new_state_memory
