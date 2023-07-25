@@ -45,7 +45,8 @@ class TaxiAgentDQN:
     def __build_model(self):
         # NN architecture: (s) -> Q(s, a)^|A| 
         model = Sequential()
-        model.add(Dense(self.neurons_first_layer, input_shape=(self.input_dimention,), activation='relu'))
+        model.add(Dense(6, input_shape=(self.input_dimention,), activation='relu'))
+        model.add(Dense(self.neurons_first_layer, activation='relu'))
         model.add(Dense(self.neurons_second_layer, activation='relu'))
         model.add(Dense(self.num_actions, activation='linear'))
         optimizer = keras.optimizers.SGD(learning_rate=self.learning_rate)
@@ -62,8 +63,8 @@ class TaxiAgentDQN:
     def init_temporary_remember(self):
         self.temporary_replay_buffer = ReplayBuffer(self.temporary_memory_size)
 
-    def remember(self, state, action, reward, next_state):
-        self.replay_buffer.store_transition(state, action, reward, next_state)
+    def remember(self, state, action, reward, next_state, terminated):
+        self.replay_buffer.store_transition(state, action, reward, next_state, terminated)
 
     def temporary_remember(self, state, action, reward, next_state):
         self.temporary_replay_buffer.store_transition(state, action, reward, next_state)
@@ -76,14 +77,16 @@ class TaxiAgentDQN:
     def choose_action(self, state):
         if np.random.random() < self.epsilon:
             action = np.random.choice(self.action_space)    # random action
-        else:
-            action = int(np.argmax(self.model.predict_on_batch(np.array([state]))))    # best action
+            #print("random action" + str(action))
+        else:       
+            action = int(np.argmax(self.model.predict_on_batch(np.array([state]))[0]))    # best action
+            #print("best action" + str(action))
         return action
 
     def learn(self):
         # check if there is enough experience
         if self.replay_buffer.mem_counter > self.batch_size:
-            state, action, reward, new_state = self.replay_buffer.sample_buffer(self.batch_size) # sample batch
+            state, action, reward, new_state, terminated = self.replay_buffer.sample_buffer(self.batch_size) # sample batch
 
             rewards = self.model.predict_on_batch(state) # get actual rewards
 
@@ -93,9 +96,9 @@ class TaxiAgentDQN:
 
             batch_index = np.arange(self.batch_size) # get the indices of the batch
 
-            q_target[batch_index, action] = reward + self.discount_factor * np.max(next_rewards, axis=1) # Update only the Q-value of selected action
+            q_target[batch_index, action] = reward + self.discount_factor * np.max(next_rewards, axis=1) * terminated # Update only the Q-value of selected action
 
             _ = self.model.fit(state, q_target, verbose=0)
 
     def decrement_epsilon(self, episode: int):
-        self.epsilon = max(self.final_epsilon, self.epsilon * self.epsilon_decrement ** episode)
+        self.epsilon = max(self.final_epsilon, self.epsilon * self.epsilon_decrement ** (episode))

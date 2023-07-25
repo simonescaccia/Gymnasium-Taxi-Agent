@@ -9,13 +9,16 @@ class ReplayBuffer(object):
         self.new_state_memory = np.zeros(self.mem_size) # contains the new state
         self.action_memory = np.zeros(self.mem_size, dtype=int)    # contains the action
         self.reward_memory = np.zeros(self.mem_size)    # contains the reward
+        self.terminated_memory = np.zeros(self.mem_size)    # contains the terminal flag
 
-    def store_transition(self, state, action, reward, new_state):
+    def store_transition(self, state, action, reward, new_state, terminated):
         index = self.mem_counter % self.mem_size    # replace the oldest entry
         self.state_memory[index] = state
         self.new_state_memory[index] = new_state
         self.action_memory[index] = action
         self.reward_memory[index] = reward
+        self.terminated_memory[index] = terminated
+
         self.mem_counter += 1
     
     def sample_buffer(self, batch_size):
@@ -26,8 +29,18 @@ class ReplayBuffer(object):
         actions = self.action_memory[batch]
         rewards = self.reward_memory[batch]
         new_states = self.new_state_memory[batch]
+        terminated = self.terminated_memory[batch]
 
-        return states, actions, rewards, new_states
+        return states, actions, rewards, new_states, terminated
     
     def get_transitions(self):
-        return self.state_memory, self.action_memory, self.reward_memory, self.new_state_memory
+        max_mem = min(self.mem_counter, self.mem_size)
+        batch = range(max_mem)   # sample batch_size entries from the 
+        
+        states = self.state_memory[batch]
+        actions = self.action_memory[batch]
+        rewards = self.reward_memory[batch]
+        new_states = self.new_state_memory[batch]
+        terminated = self.terminated_memory[batch]
+
+        return states, actions, rewards, new_states, terminated
