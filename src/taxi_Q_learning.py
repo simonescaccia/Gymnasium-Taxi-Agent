@@ -2,7 +2,7 @@
 import gymnasium as gym
 from matplotlib.patches import Patch
 
-from taxi_agent import TaxiAgent
+from q_learning.taxi_agent import TaxiAgent
 from tqdm import tqdm # for progress bar
 from matplotlib import pyplot as plt
 import numpy as np

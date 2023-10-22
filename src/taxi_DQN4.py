@@ -10,11 +10,11 @@ import tensorflow as tf
 from taxi_agent_DQN import TaxiAgentDQN
 
 # hyperparameters
-replay_buffer_size = 1000000 # Max batch size of past experience
-temporary_replay_buffer_size = 200 # Max number of steps in an episode
-batch_size = 64 # Training set size
+replay_buffer_size = 5000 # Max batch size of past experience
+temporary_replay_buffer_size = 200 # Max batch size of experience in current episode
+batch_size = 200 # Training set size
 start_epsilon = 1
-epsilon_decrement = 0.9999
+epsilon_decrement = 0.9995
 final_epsilon = 0.01
 discount_factor = 0.99
 neurons_first_layer = 50
@@ -71,9 +71,10 @@ if __name__ == "__main__":
             taxi_agent.remember(obs, action, reward, next_obs, int(terminated))
             obs = next_obs
             taxi_agent.learn()
-            taxi_agent.decrement_epsilon(episode) 
             done = terminated or truncated
-            actions += 1     
+            actions += 1   
+
+        taxi_agent.decrement_epsilon(1) 
 
         episode += 1
         scores.append(score)
@@ -85,6 +86,5 @@ if __name__ == "__main__":
               '-- epsilon: %.2f' % taxi_agent.epsilon,
               '-- actions: ', actions)
 
-        if episode % 10 == 0 and episode > 0:
-            taxi_agent.save_model(CHECKPOINT_PATH)
+        taxi_agent.save_model(CHECKPOINT_PATH)
 

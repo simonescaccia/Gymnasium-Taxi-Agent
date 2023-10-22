@@ -1,4 +1,3 @@
-from collections import defaultdict
 import gymnasium as gym
 import numpy as np
 
@@ -61,17 +60,6 @@ class TaxiAgent:
 
         # Qlearning algorithm: Q(s,a) := reward + discount_factor * max Q(s',a')
         self.q_table[state, action] = reward + self.discount_factor * np.max(self.q_table[new_state])
-
-    def update_sarsa(
-        self,
-        state: int,
-        action: int,
-        reward: float,
-        new_state: int,
-    ):
-        # SARSA Qlearning algorithm: Q(s,a) = Q(s,a) + learning_rate * (reward + discount_factor * max Q(s',a') - Q(s,a))
-
-        self.q_table[state, action] = self.q_table[state, action] + self.learning_rate * (reward + self.discount_factor * np.max(self.q_table[new_state]) - self.q_table[state, action])
 
     def decay_epsilon(self):
         # decrease epsilon: prefer exploration first, then exploitation 
