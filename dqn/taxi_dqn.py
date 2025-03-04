@@ -96,10 +96,10 @@ class TaxiDQN:
         self.rewards = 0
 
 
-    def state_to_onehot(self, state):
-        
-        onehot = np.zeros(self.num_states)
-        onehot[state] = 1
+    def states_to_onehot(self, states: torch.IntTensor):
+        # Convert state to one-hot encoding
+        onehot = torch.zeros((states.shape[0], self.num_states)).to(device)
+        onehot[torch.arange(states.shape[0]), states.squeeze()] = 1
         return onehot
 
     def take_step(self, mode='exploit'):
@@ -108,7 +108,8 @@ class TaxiDQN:
             action = self.env.action_space.sample()
         else:
             with torch.no_grad():
-                action = self.policy_dqn(self.state_to_onehot(self.s_0)).argmax().item()
+                state = torch.IntTensor([self.s_0]).to(device)
+                action = self.policy_dqn(self.states_to_onehot(state)).argmax().item()
 
         #simulate action
         s_1, r, terminated, truncated, _ = self.env.step(action)
@@ -130,8 +131,10 @@ class TaxiDQN:
     def train(self):
 
         # Populate replay buffer
+        print("Populating replay buffer...")
         while self.memory.burn_in_capacity() < 1:
             self.take_step(mode='explore')
+        print("Replay buffer populated.")
 
         ep = 0
         training = True
@@ -168,7 +171,7 @@ class TaxiDQN:
                     self.update_loss = []
 
                     print(
-                        "\rEpisode {:d}  Episode reward = {:.2f}   Mean loss = {:.2f}\t\t".format(
+                        "\nEpisode {:d}  Episode reward = {:.2f}   Mean loss = {:.2f}".format(
                             ep, self.rewards, np.mean(self.update_loss)), end="")
 
                     if ep >= self.episodes:
@@ -211,10 +214,10 @@ class TaxiDQN:
         ###############
         # DQN Update #
         ###############
-        qvals = self.policy_dqn(self.state_to_onehot(states))
+        qvals = self.policy_dqn(self.states_to_onehot(states))
         qvals = torch.gather(qvals, 1, actions)
 
-        next_qvals = self.target_dqn(self.state_to_onehot(next_states))
+        next_qvals = self.target_dqn(self.states_to_onehot(next_states))
         next_qvals_max = torch.max(next_qvals, dim=-1)[0].reshape(-1, 1)
         target_qvals = rewards + (1 - dones)*self.gamma*next_qvals_max
 
