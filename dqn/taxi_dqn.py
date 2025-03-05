@@ -18,10 +18,12 @@ class Net(nn.Module):
 
         # Define network layers
         self.fc1 = nn.Linear(in_states, h1_nodes)   # first fully connected layer
+        self.fc2 = nn.Linear(h1_nodes, h1_nodes)     # second fully connected layer
         self.out = nn.Linear(h1_nodes, out_actions) # ouptut layer
 
     def forward(self, x):
         x = F.relu(self.fc1(x)) # Apply rectified linear unit (ReLU) activation
+        x = F.relu(self.fc2(x))
         x = self.out(x)         # Calculate output
         return x
     
@@ -59,19 +61,19 @@ class TaxiDQN:
         self.env = gym.make('Taxi-v3')
 
         self.step_count = 0
-        self.gamma = 0.99
-        self.s_0, _ = self.env.reset() # Initial state
+        self.gamma = 0.9
+        self.s_0, _ = self.env.reset(seed = 0) # Initial state
         self.num_states = 500
         self.episodes = 10000
-        self.batch_size = 64
+        self.batch_size = 512
         self.loss_function = nn.MSELoss()
 
-        replay_memory_size = 5000
-        replay_memory_burn_in = 1000
+        replay_memory_size = 50000
+        replay_memory_burn_in = 10000
         learning_rate = 0.001
         self.epsilon = 1 # 1 = 100% random actions
         in_states = self.num_states
-        h1_nodes = 128
+        h1_nodes = 50
         out_actions = 6
 
         self.policy_dqn = Net(in_states, h1_nodes, out_actions).to(device)
@@ -124,7 +126,7 @@ class TaxiDQN:
 
         self.step_count += 1
         if done:
-            self.s_0, _ = self.env.reset()
+            self.s_0, _ = self.env.reset(seed=0)
         return done
 
     # Implement DQN training algorithm
@@ -139,7 +141,7 @@ class TaxiDQN:
         ep = 0
         training = True
         while training:
-            self.s_0, _ = self.env.reset()
+            self.s_0, _ = self.env.reset(seed = 0)
 
             self.rewards = 0
             done = False
@@ -159,21 +161,25 @@ class TaxiDQN:
                     ep += 1
                     
                     # Decay epsilon
-                    self.epsilon = max(self.epsilon - 1/self.episodes, 0)
+                    if self.epsilon >= 0.05:
+                        self.epsilon = self.epsilon * 0.995
+                    # self.epsilon = max(self.epsilon - 1/self.episodes, 0)
                     self.epsilon_history.append(self.epsilon)
                     
                     # Log training progress
+                    ep_loss = np.mean(self.update_loss)
                     self.training_rewards.append(self.rewards)
+                    self.training_loss.append(ep_loss)
                     if len(self.update_loss) == 0:
                         self.training_loss.append(0)
                     else:
-                        self.training_loss.append(np.mean(self.update_loss))
-                    self.update_loss = []
+                        self.training_loss.append(ep_loss)
 
                     print(
-                        "\nEpisode {:d}  Episode reward = {:.2f}   Mean loss = {:.2f}".format(
-                            ep, self.rewards, np.mean(self.update_loss)), end="")
+                        "\nEpisode {:d}  Episode reward = {:.2f}  Epsilon = {:.2f}  Episode length = {:.0f}  Mean loss = {:.10f}".format(
+                            ep, self.rewards, self.epsilon, len(self.update_loss), ep_loss), end="")
 
+                    self.update_loss = []
                     if ep >= self.episodes:
                         training = False
                         print('\nEpisode limit reached.')
@@ -191,13 +197,23 @@ class TaxiDQN:
         self.policy_dqn.eval()
 
     def plot_training_rewards(self):
-        plt.plot(self.mean_training_rewards)
-        plt.title('Mean training rewards')
+        # Plot two figures in the same plot: training rewards and loss
+        plt.figure(figsize=(12, 6))
+        plt.subplot(1, 2, 1)
+        plt.plot(self.training_rewards)
+        plt.title('Training Rewards')
+        plt.xlabel('Episode')
         plt.ylabel('Reward')
-        plt.xlabel('Episods')
+        plt.grid()
+
+        plt.subplot(1, 2, 2)
+        plt.plot(self.training_loss)
+        plt.title('Training Loss')
+        plt.xlabel('Episode')
+        plt.ylabel('Loss')
+        plt.grid()
+
         plt.show()
-        plt.savefig('mean_training_rewards.png')
-        plt.clf()
 
 
     def calculate_loss(self, batch):
