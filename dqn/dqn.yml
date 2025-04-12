@@ -1,0 +1,8 @@
+n_timesteps: !!float 16e4
+buffer_size: 100000
+learning_rate: !!float 1e-3
+batch_size: 256
+learning_starts: 100000
+target_update_interval: 1000
+exploration_fraction: 0.1
+exploration_final_eps: 0.01

@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import gymnasium as gym
 import matplotlib.pyplot as plt
+import sys
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -61,19 +62,19 @@ class TaxiDQN:
         self.env = gym.make('Taxi-v3')
 
         self.step_count = 0
-        self.gamma = 0.9
+        self.gamma = 0.99
         self.s_0, _ = self.env.reset(seed = 0) # Initial state
         self.num_states = 500
-        self.episodes = 10000
-        self.batch_size = 512
+        self.episodes = 13000
+        self.batch_size = 256
         self.loss_function = nn.MSELoss()
 
-        replay_memory_size = 50000
-        replay_memory_burn_in = 10000
-        learning_rate = 0.001
+        replay_memory_size = 100000
+        replay_memory_burn_in = 100000
+        learning_rate = 0.003
         self.epsilon = 1 # 1 = 100% random actions
         in_states = self.num_states
-        h1_nodes = 50
+        h1_nodes = 256
         out_actions = 6
 
         self.policy_dqn = Net(in_states, h1_nodes, out_actions).to(device)
@@ -141,6 +142,10 @@ class TaxiDQN:
         ep = 0
         training = True
         while training:
+            # if ep > 0 and (ep % 1000) == 0:
+            #     self.env = gym.make('Taxi-v3', render_mode="human")
+            # elif ep > 1 and (ep % 1000) == 1:
+            #     self.env = gym.make('Taxi-v3')
             self.s_0, _ = self.env.reset(seed = 0)
 
             self.rewards = 0
@@ -161,8 +166,8 @@ class TaxiDQN:
                     ep += 1
                     
                     # Decay epsilon
-                    if self.epsilon >= 0.05:
-                        self.epsilon = self.epsilon * 0.995
+                    if self.epsilon >= 0.02:
+                        self.epsilon = self.epsilon - self.epsilon * 0.01
                     # self.epsilon = max(self.epsilon - 1/self.episodes, 0)
                     self.epsilon_history.append(self.epsilon)
                     
@@ -176,8 +181,8 @@ class TaxiDQN:
                         self.training_loss.append(ep_loss)
 
                     print(
-                        "\nEpisode {:d}  Episode reward = {:.2f}  Epsilon = {:.2f}  Episode length = {:.0f}  Mean loss = {:.10f}".format(
-                            ep, self.rewards, self.epsilon, len(self.update_loss), ep_loss), end="")
+                        "\nEpisode {:d}  Episode reward = {:.2f}  Epsilon = {:.2f}  Episode length = {:.0f}  Mean last 100 rewards = {:.2f}".format(
+                            ep, self.rewards, self.epsilon, len(self.update_loss), np.mean(self.training_rewards[-100:])), end="")
 
                     self.update_loss = []
                     if ep >= self.episodes:
@@ -187,34 +192,44 @@ class TaxiDQN:
         # save models
         self.save_models()
         # plot
-        self.plot_training_rewards()
+        self.plot_training_info()
 
     def save_models(self):
         torch.save(self.policy_dqn, "Q_net")
 
     def load_models(self):
-        self.policy_dqn = torch.load("Q_net")
+        self.policy_dqn = torch.load("Q_net", weights_only=False)
         self.policy_dqn.eval()
 
-    def plot_training_rewards(self):
-        # Plot two figures in the same plot: training rewards and loss
-        plt.figure(figsize=(12, 6))
-        plt.subplot(1, 2, 1)
+    def plot_training_info(self, save=False):
+        # Plot three figures in the same plot: training rewards, loss and epsilon decay
+        plt.figure(figsize=(18, 6))
+
+        plt.subplot(1, 3, 1)
         plt.plot(self.training_rewards)
         plt.title('Training Rewards')
         plt.xlabel('Episode')
         plt.ylabel('Reward')
         plt.grid()
 
-        plt.subplot(1, 2, 2)
+        plt.subplot(1, 3, 2)
         plt.plot(self.training_loss)
         plt.title('Training Loss')
         plt.xlabel('Episode')
         plt.ylabel('Loss')
         plt.grid()
 
-        plt.show()
+        plt.subplot(1, 3, 3)
+        plt.plot(self.epsilon_history)
+        plt.title('Epsilon Decay')
+        plt.xlabel('Episode')
+        plt.ylabel('Epsilon')
+        plt.grid()
 
+        if save:
+            plt.savefig('training_info.png')
+        else:
+            plt.show()      
 
     def calculate_loss(self, batch):
         #extract info from batch
@@ -255,13 +270,15 @@ class TaxiDQN:
         self.update_loss.append(loss.item())
 
 
-    def evaluate(self, eval_env):
+    def evaluate(self):
         done = False
-        s, _ = eval_env.reset()
+        s, _ = self.env.reset(seed = 0)
         rew = 0
         while not done:
-            action = self.policy_dqn.greedy_action(torch.FloatTensor(s).to(device))
-            s, r, terminated, truncated, _ = eval_env.step(action)
+            with torch.no_grad():
+                state = torch.IntTensor([s]).to(device)
+                action = self.policy_dqn(self.states_to_onehot(state)).argmax().item()
+            s, r, terminated, truncated, _ = self.env.step(action)
             done = terminated or truncated
             rew += r
 
@@ -269,9 +286,17 @@ class TaxiDQN:
 
 
 if __name__ == '__main__':
+    print("Device: ", device)
+
     agent = TaxiDQN()
+    train_test = int(sys.argv[1])
 
-    agent.train()
+    if train_test == 0:
+        agent.train()
+    elif train_test == 1:
+        agent.load_models()
+    else:
+        raise ValueError("Train: 0, Train: 1")
 
-    agent.env = gym.make('Taxi-v3', render='human')
+    agent.env = gym.make('Taxi-v3', render_mode="human")
     agent.evaluate()
