@@ -1,6 +1,7 @@
 import yaml
 import os
 import matplotlib.pyplot as plt
+import torch
 
 CONFIG_FILE = "dqn.yml"
 
@@ -42,11 +43,17 @@ def load_config(log_dir, config_path):
 
     return config
 
+class MLP(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.optimizer = torch.optim.Adam
+
 class DQN():
     def __init__(self, config, log_dir):
         self.exploration_fraction = config['exploration_fraction']
         self.exploration_final_eps = config['exploration_final_eps']
         self.n_timestep = int(config['n_timesteps'])
+
 
         # Logs
         self.log_dir = log_dir
