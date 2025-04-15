@@ -1,9 +1,23 @@
+import numpy as np
 import yaml
 import os
 import matplotlib.pyplot as plt
 import torch
 
 CONFIG_FILE = "dqn.yml"
+
+
+def get_device():
+    """
+    Get the device to use for PyTorch.
+    :return: Device object.
+    """
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
+    return device
+
 
 def setup_logging(log_dir):
     """
@@ -43,10 +57,12 @@ def load_config(log_dir, config_path):
 
     return config
 
+
 class MLP(torch.nn.Module):
     def __init__(self):
         super().__init__()
         self.optimizer = torch.optim.Adam
+
 
 class DQN():
     def __init__(self, config, log_dir):
@@ -92,6 +108,41 @@ class DQN():
         plt.grid()
         plt.savefig(os.path.join(self.log_dir, "epsilon.png"))
         plt.close()
+
+
+class ReplayBuffer():
+    def __init__(self, buffer_size):
+        self.states = np.zeros((buffer_size), dtype=int)
+        self.actions = np.zeros((buffer_size), dtype=int)
+        self.rewards = np.zeros((buffer_size), dtype=float)
+        self.new_states = np.zeros((buffer_size), dtype=int)
+        self.dones = np.zeros((buffer_size), dtype=bool)
+
+        self.pos = 0
+        self.buffer_size = buffer_size
+        self.full = False
+        self.device = get_device()
+
+    def add(self, state, action, reward, new_state, done):
+        self.states[self.pos] = np.array(state)
+        self.actions[self.pos] = np.array(action)
+        self.rewards[self.pos] = np.array(reward)
+        self.new_states[self.pos] = np.array(new_state)
+        self.dones[self.pos] = np.array(done)
+
+        self.pos += 1
+        if self.pos == self.buffer_size:
+            self.full = True
+            self.pos = 0
+
+    def sample(self, batch_size):
+        if self.full:
+            batch = np.random.choice(self.buffer_size, batch_size)
+        else:
+            batch = np.random.choice(self.pos, batch_size)
+            
+
+
 
 if __name__ == "__main__":
     # Set up log files
